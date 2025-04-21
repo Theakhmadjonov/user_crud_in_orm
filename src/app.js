@@ -1,24 +1,26 @@
 import express from "express";
 import Routes from "./routes.js";
+import { PrismaClient } from "@prisma/client";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import "dotenv/config";
 
 const app = express();
+const prisma = new PrismaClient();
 
 app.use(express.json());
-app.use(Routes());
+app.use("/api", Routes());
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 const bootstrap = async () => {
-    try {
-        
+  try {
+    await prisma.$connect();
+    app.listen(PORT, () => console.log(`Server is running ${PORT}`));
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
 
-
-        app.listen(PORT, () => console.log(`Server is running ${PORT}`));
-    } catch (error) {
-        console.log(error);
-        process.exit(1);
-    }
-}
 bootstrap();
